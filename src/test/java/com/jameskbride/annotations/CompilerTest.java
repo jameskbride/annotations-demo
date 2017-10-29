@@ -14,7 +14,7 @@ import java.net.URLClassLoader;
 import java.util.Arrays;
 import java.util.List;
 
-public class CompilerTest {
+public abstract class CompilerTest {
     protected static String OUTPUT_PATH_NAME;
     protected DiagnosticCollector<JavaFileObject> diagnosticCollector;
     protected CompiledRetrofitAnnotationProcessor processor;
