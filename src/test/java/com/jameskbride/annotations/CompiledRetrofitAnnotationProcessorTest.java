@@ -6,6 +6,8 @@ import org.junit.Test;
 import javax.lang.model.SourceVersion;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Modifier;
+import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
@@ -45,6 +47,19 @@ public class CompiledRetrofitAnnotationProcessorTest extends CompilerTest {
         Class goodBase = loadClasses(inputPath, "GoodBase");
         Class goodBaseProxy = loadClasses(OUTPUT_PATH_NAME, "GoodBaseProxy");
         assertTrue(goodBase.isAssignableFrom(goodBaseProxy));
+    }
+
+    @Test
+    public void itGeneratesAClassThatHasTheSameScopeModifierAsTheInterface() throws URISyntaxException, MalformedURLException, ClassNotFoundException {
+        File libraryFile = new File(getClassLoader().getResource("GoodBase.java").toURI());
+
+        List<File> files = Arrays.asList(libraryFile);
+        boolean success = compile(files, processor);
+
+        assertTrue(success);
+
+        Class goodBaseProxy = loadClasses(OUTPUT_PATH_NAME, "GoodBaseProxy");
+        assertEquals(Modifier.PUBLIC, goodBaseProxy.getModifiers());
     }
 
     protected String getInputPath() throws URISyntaxException {

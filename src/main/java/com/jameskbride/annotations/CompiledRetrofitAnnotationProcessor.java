@@ -12,6 +12,7 @@ import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import java.io.IOException;
 import java.util.Set;
@@ -35,6 +36,7 @@ public class CompiledRetrofitAnnotationProcessor extends AbstractProcessor {
 
             TypeSpec proxyType = TypeSpec.classBuilder(element.getSimpleName().toString() + "Proxy")
                     .addSuperinterface(TypeName.get(element.asType()))
+                    .addModifiers(getModifiers(element))
                     .build();
 
             JavaFile javaFile = JavaFile.builder("", proxyType).build();
@@ -47,6 +49,12 @@ public class CompiledRetrofitAnnotationProcessor extends AbstractProcessor {
         }
 
         return true;
+    }
+
+    private Modifier[] getModifiers(Element element) {
+        return element.getModifiers()
+                .stream()
+                .filter(modifier -> !modifier.equals(Modifier.ABSTRACT)).toArray(size -> new Modifier[size]);
     }
 
     @Override
