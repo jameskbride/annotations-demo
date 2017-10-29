@@ -5,15 +5,20 @@ import okhttp3.OkHttpClient;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
+import javax.tools.Diagnostic;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public class ProxyModel {
     private Element baseElement;
     private Set<MethodModel> methods;
+    private List<Validation> validations;
 
     public ProxyModel(Element element) {
+        validations = new ArrayList<>();
         methods = new HashSet<>();
         baseElement = element;
     }
@@ -53,5 +58,13 @@ public class ProxyModel {
     public void addMethod(Element element) {
         MethodModel methodModel = new MethodModel(element);
         methods.add(methodModel);
+    }
+
+    public List<Validation> validate() {
+        if (!baseElement.getKind().isInterface()) {
+            validations.add(new Validation(Diagnostic.Kind.ERROR, "RetrofitBase must be applied to an interface"));
+        }
+
+        return validations;
     }
 }

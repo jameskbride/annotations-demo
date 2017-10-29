@@ -3,6 +3,7 @@ package com.jameskbride.annotations;
 import com.google.auto.service.AutoService;
 import com.google.common.collect.Sets;
 import com.jameskbride.annotations.model.ProxyModel;
+import com.jameskbride.annotations.model.Validation;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.TypeSpec;
 
@@ -12,9 +13,7 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @AutoService(AbstractProcessor.class)
 public class CompiledRetrofitAnnotationProcessor extends AbstractProcessor {
@@ -34,10 +33,26 @@ public class CompiledRetrofitAnnotationProcessor extends AbstractProcessor {
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         Map<String, ProxyModel> proxyMap = handleRetrofitBase(roundEnv);
+        List<Validation> validations = proxyMap.entrySet().stream()
+                .map(entry -> entry.getValue().validate())
+                .reduce(new ArrayList<>(), (accum, validationList) -> {accum.addAll(validationList); return accum;});
+
+        if (errorsPresent(validations)) {
+            validations.stream().forEach(validation -> messager.printMessage(validation.getKind(), validation.getMessage()));
+            return true;
+        }
+
         handleGET(roundEnv, proxyMap);
         writeJavaClasses(proxyMap);
 
         return true;
+    }
+
+    private boolean errorsPresent(List<Validation> validations) {
+        return validations.stream()
+                .filter(validation -> validation.getKind().equals(Diagnostic.Kind.ERROR))
+                .findAny()
+                .isPresent();
     }
 
     private void writeJavaClasses(Map<String, ProxyModel> proxyMap) {
@@ -69,9 +84,6 @@ public class CompiledRetrofitAnnotationProcessor extends AbstractProcessor {
         Set<? extends Element> retrofitBaseTypes = roundEnv.getElementsAnnotatedWith(RetrofitBase.class);
         Map<String, ProxyModel> proxyMap = new HashMap<>();
         retrofitBaseTypes.stream().forEach(element -> {
-            if (!element.getKind().isInterface()) {
-                messager.printMessage(Diagnostic.Kind.ERROR, "RetrofitBase must be applied to an interface");
-            }
             ProxyModel proxyModel = new ProxyModel(element);
             proxyMap.put(element.getSimpleName().toString(), proxyModel);
         });
