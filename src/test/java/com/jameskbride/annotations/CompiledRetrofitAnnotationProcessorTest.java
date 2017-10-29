@@ -18,11 +18,11 @@ import static org.junit.Assert.assertTrue;
 
 public class CompiledRetrofitAnnotationProcessorTest {
 
+    private static final String OUTPUT_PATH_NAME = "build/generated";
     private DiagnosticCollector<JavaFileObject> diagnosticCollector;
     private CompiledRetrofitAnnotationProcessor processor;
     private JavaCompiler compiler;
     private StandardJavaFileManager fileManager;
-    private File temp;
 
     @Before
     public void setUp() throws IOException {
@@ -30,13 +30,14 @@ public class CompiledRetrofitAnnotationProcessorTest {
         diagnosticCollector = new DiagnosticCollector<>();
         fileManager = compiler.getStandardFileManager(diagnosticCollector, null, null);
         processor = new CompiledRetrofitAnnotationProcessor();
-        temp = Files.createTempDir();
+        File file = new File(OUTPUT_PATH_NAME);
+        file.delete();
+        Files.createParentDirs(new File(OUTPUT_PATH_NAME + "/this_segment_is_ignored"));
     }
 
     @After
     public void tearDown() throws IOException {
         fileManager.close();
-        temp.delete();
     }
 
     @Test
@@ -63,7 +64,7 @@ public class CompiledRetrofitAnnotationProcessorTest {
         Iterable<? extends JavaFileObject> compilationUnits1 =
                 fileManager.getJavaFileObjectsFromFiles(Arrays.asList(libraryFile));
         DiagnosticCollector<JavaFileObject> diagnosticCollector = new DiagnosticCollector<>();
-        List<String> options = Arrays.asList( "-d", temp.getAbsolutePath() );
+        List<String> options = Arrays.asList( "-s", OUTPUT_PATH_NAME);
         JavaCompiler.CompilationTask compilerTask = compiler.getTask(null, fileManager, diagnosticCollector, options, null, compilationUnits1);
         compilerTask.setProcessors(Arrays.asList(new CompiledRetrofitAnnotationProcessor()));
         boolean success = compilerTask.call();
