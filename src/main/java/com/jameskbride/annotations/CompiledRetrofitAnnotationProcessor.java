@@ -33,12 +33,9 @@ public class CompiledRetrofitAnnotationProcessor extends AbstractProcessor {
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         Map<String, ProxyModel> proxyMap = handleRetrofitBase(roundEnv);
-        List<Validation> validations = proxyMap.entrySet().stream()
-                .map(entry -> entry.getValue().validate())
-                .reduce(new ArrayList<>(), (accum, validationList) -> {accum.addAll(validationList); return accum;});
-
+        List<Validation> validations = getValidations(proxyMap);
+        printCompileMessages(validations);
         if (errorsPresent(validations)) {
-            validations.stream().forEach(validation -> messager.printMessage(validation.getKind(), validation.getMessage()));
             return true;
         }
 
@@ -46,6 +43,18 @@ public class CompiledRetrofitAnnotationProcessor extends AbstractProcessor {
         writeJavaClasses(proxyMap);
 
         return true;
+    }
+
+    private void printCompileMessages(List<Validation> validations) {
+        validations.stream().forEach(validation -> messager.printMessage(validation.getKind(), validation.getMessage()));
+    }
+
+    private List<Validation> getValidations(Map<String, ProxyModel> proxyMap) {
+        List<Validation> validations = proxyMap.entrySet().stream()
+                .map(entry -> entry.getValue().validate())
+                .reduce(new ArrayList<>(), (accum, validationList) -> {accum.addAll(validationList); return accum;});
+
+        return validations;
     }
 
     private boolean errorsPresent(List<Validation> validations) {
