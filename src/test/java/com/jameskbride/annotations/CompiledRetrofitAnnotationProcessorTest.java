@@ -1,5 +1,7 @@
 package com.jameskbride.annotations;
 
+import com.google.common.collect.Sets;
+import okhttp3.Call;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -8,6 +10,7 @@ import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -16,9 +19,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class CompiledRetrofitAnnotationProcessorTest extends CompilerTest {
 
@@ -37,7 +38,12 @@ public class CompiledRetrofitAnnotationProcessorTest extends CompilerTest {
 
     @Test
     public void itHasAListOfSupportedAnnotations() {
-        assertTrue(processor.getSupportedAnnotationTypes().contains(RetrofitBase.class.getCanonicalName()));
+        assertTrue(processor.getSupportedAnnotationTypes().containsAll(
+                Sets.newHashSet(
+                        RetrofitBase.class.getCanonicalName(),
+                        GET.class.getCanonicalName()
+                ))
+        );
     }
 
     @Test
@@ -81,6 +87,21 @@ public class CompiledRetrofitAnnotationProcessorTest extends CompilerTest {
                 .filter(diagnostic -> diagnostic.getKind().equals(Diagnostic.Kind.ERROR))
                 .findAny();
         assertEquals("RetrofitBase must be applied to an interface", error.get().getMessage(Locale.US));
+    }
+
+    @Test
+    public void itGeneratesAMethodForAGETAnnotation() throws MalformedURLException, ClassNotFoundException, URISyntaxException, NoSuchMethodException {
+        File libraryFile = new File(getClassLoader().getResource("SimpleMethodBase.java").toURI());
+
+        List<File> files = Arrays.asList(libraryFile);
+        boolean result = compile(files, processor);
+
+        assertTrue(result);
+
+        Class goodBaseProxy = loadClasses(OUTPUT_PATH_NAME, "SimpleMethodBaseProxy");
+        Method returnSomething = goodBaseProxy.getMethod("returnSomething");
+        assertNotNull(returnSomething);
+        assertEquals(Call.class, returnSomething.getReturnType());
     }
 
     protected String getInputPath() throws URISyntaxException {
