@@ -33,25 +33,14 @@ public class CompiledRetrofitAnnotationProcessor extends AbstractProcessor {
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-        Set<? extends Element> retrofitBaseTypes = roundEnv.getElementsAnnotatedWith(RetrofitBase.class);
-        Map<String, ProxyModel> proxyMap = new HashMap<>();
-        retrofitBaseTypes.stream().forEach(element -> {
-            if (!element.getKind().isInterface()) {
-                messager.printMessage(Diagnostic.Kind.ERROR, "RetrofitBase must be applied to an interface");
-            }
-            ProxyModel proxyModel = new ProxyModel(element);
-            proxyMap.put(element.getSimpleName().toString(), proxyModel);
-        });
+        Map<String, ProxyModel> proxyMap = handleRetrofitBase(roundEnv);
+        handleGET(roundEnv, proxyMap);
+        writeJavaClasses(proxyMap);
 
-        Set<? extends Element> getMethods = roundEnv.getElementsAnnotatedWith(GET.class);
-        getMethods.stream().forEach(getMethod -> {
-            Element enclosingElement = getMethod.getEnclosingElement();
-            ProxyModel proxyModel = proxyMap.get(enclosingElement.getSimpleName().toString());
-            if (proxyModel != null) {
-                proxyModel.addMethod(getMethod);
-            }
-        });
+        return true;
+    }
 
+    private void writeJavaClasses(Map<String, ProxyModel> proxyMap) {
         proxyMap.entrySet().stream().forEach(proxyModelEntry -> {
             ProxyModel proxyModel = proxyModelEntry.getValue();
             TypeSpec proxyType = proxyModel.buildTypeSpec();
@@ -63,8 +52,30 @@ public class CompiledRetrofitAnnotationProcessor extends AbstractProcessor {
                 e.printStackTrace();
             }
         });
+    }
 
-        return true;
+    private void handleGET(RoundEnvironment roundEnv, Map<String, ProxyModel> proxyMap) {
+        Set<? extends Element> getMethods = roundEnv.getElementsAnnotatedWith(GET.class);
+        getMethods.stream().forEach(getMethod -> {
+            Element enclosingElement = getMethod.getEnclosingElement();
+            ProxyModel proxyModel = proxyMap.get(enclosingElement.getSimpleName().toString());
+            if (proxyModel != null) {
+                proxyModel.addMethod(getMethod);
+            }
+        });
+    }
+
+    private Map<String, ProxyModel> handleRetrofitBase(RoundEnvironment roundEnv) {
+        Set<? extends Element> retrofitBaseTypes = roundEnv.getElementsAnnotatedWith(RetrofitBase.class);
+        Map<String, ProxyModel> proxyMap = new HashMap<>();
+        retrofitBaseTypes.stream().forEach(element -> {
+            if (!element.getKind().isInterface()) {
+                messager.printMessage(Diagnostic.Kind.ERROR, "RetrofitBase must be applied to an interface");
+            }
+            ProxyModel proxyModel = new ProxyModel(element);
+            proxyMap.put(element.getSimpleName().toString(), proxyModel);
+        });
+        return proxyMap;
     }
 
     @Override

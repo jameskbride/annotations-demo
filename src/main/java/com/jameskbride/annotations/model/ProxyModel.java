@@ -1,19 +1,17 @@
 package com.jameskbride.annotations.model;
 
-import com.squareup.javapoet.CodeBlock;
-import com.squareup.javapoet.MethodSpec;
-import com.squareup.javapoet.TypeName;
-import com.squareup.javapoet.TypeSpec;
-import okhttp3.Call;
+import com.squareup.javapoet.*;
+import okhttp3.OkHttpClient;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class ProxyModel {
     private Element baseElement;
-    private Set<MethodSpec> methods;
+    private Set<MethodModel> methods;
 
     public ProxyModel(Element element) {
         methods = new HashSet<>();
@@ -38,8 +36,14 @@ public class ProxyModel {
         return TypeSpec.classBuilder(getProxyClassName())
                 .addSuperinterface(getTypeName())
                 .addModifiers(getModifiers())
-                .addMethods(methods)
+                .addField(generateOkHttpClientProperty())
+                .addMethods(methods.stream().map(method -> method.build()).collect(Collectors.toSet()))
                 .build();
+    }
+
+    private FieldSpec generateOkHttpClientProperty() {
+        return FieldSpec.builder(OkHttpClient.class, "client", Modifier.PRIVATE, Modifier.FINAL)
+            .initializer("new $T()", ClassName.get(OkHttpClient.class)).build();
     }
 
     public String getPackage() {
@@ -47,11 +51,7 @@ public class ProxyModel {
     }
 
     public void addMethod(Element element) {
-        MethodSpec methodSpec = MethodSpec.methodBuilder(element.getSimpleName().toString())
-                .addModifiers(Modifier.PUBLIC)
-                .returns(TypeName.get(Call.class))
-                .addCode(CodeBlock.builder().addStatement("return null").build())
-                .build();
-        methods.add(methodSpec);
+        MethodModel methodModel = new MethodModel(element);
+        methods.add(methodModel);
     }
 }
