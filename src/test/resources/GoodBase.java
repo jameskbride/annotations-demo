@@ -1,6 +1,6 @@
 import com.jameskbride.annotations.RetrofitBase;
 
 @RetrofitBase
-interface GoodBase {
+public interface GoodBase {
 
 }
