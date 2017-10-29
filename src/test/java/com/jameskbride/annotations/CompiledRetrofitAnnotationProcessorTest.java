@@ -80,7 +80,7 @@ public class CompiledRetrofitAnnotationProcessorTest extends CompilerTest {
                 .stream()
                 .filter(diagnostic -> diagnostic.getKind().equals(Diagnostic.Kind.ERROR))
                 .findAny();
-        assertEquals("interface expected here", error.get().getMessage(Locale.US));
+        assertEquals("RetrofitBase must be applied to an interface", error.get().getMessage(Locale.US));
     }
 
     protected String getInputPath() throws URISyntaxException {

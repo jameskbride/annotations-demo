@@ -6,14 +6,12 @@ import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 
-import javax.annotation.processing.AbstractProcessor;
-import javax.annotation.processing.Filer;
-import javax.annotation.processing.ProcessingEnvironment;
-import javax.annotation.processing.RoundEnvironment;
+import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
+import javax.tools.Diagnostic;
 import java.io.IOException;
 import java.util.Set;
 
@@ -21,12 +19,14 @@ import java.util.Set;
 public class CompiledRetrofitAnnotationProcessor extends AbstractProcessor {
 
     private Filer filer;
+    private Messager messager;
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
         super.init(processingEnv);
 
         filer = processingEnv.getFiler();
+        messager = processingEnv.getMessager();
     }
 
     @Override
@@ -34,6 +34,10 @@ public class CompiledRetrofitAnnotationProcessor extends AbstractProcessor {
         Set<? extends Element> retrofitBaseTypes = roundEnv.getElementsAnnotatedWith(RetrofitBase.class);
         for (Element element : retrofitBaseTypes) {
 
+            if (!element.getKind().isInterface()) {
+                messager.printMessage(Diagnostic.Kind.ERROR, "RetrofitBase must be applied to an interface");
+                return true;
+            }
             TypeSpec proxyType = TypeSpec.classBuilder(element.getSimpleName().toString() + "Proxy")
                     .addSuperinterface(TypeName.get(element.asType()))
                     .addModifiers(getModifiers(element))
