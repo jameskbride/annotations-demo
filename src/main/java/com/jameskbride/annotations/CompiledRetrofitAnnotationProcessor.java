@@ -2,19 +2,51 @@ package com.jameskbride.annotations;
 
 import com.google.auto.service.AutoService;
 import com.google.common.collect.Sets;
+import com.squareup.javapoet.JavaFile;
+import com.squareup.javapoet.TypeName;
+import com.squareup.javapoet.TypeSpec;
 
 import javax.annotation.processing.AbstractProcessor;
+import javax.annotation.processing.Filer;
+import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
+import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
-import java.util.Arrays;
+import java.io.IOException;
 import java.util.Set;
 
 @AutoService(AbstractProcessor.class)
 public class CompiledRetrofitAnnotationProcessor extends AbstractProcessor {
+
+    private Filer filer;
+
+    @Override
+    public synchronized void init(ProcessingEnvironment processingEnv) {
+        super.init(processingEnv);
+
+        filer = processingEnv.getFiler();
+    }
+
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-        return false;
+        Set<? extends Element> retrofitBaseTypes = roundEnv.getElementsAnnotatedWith(RetrofitBase.class);
+        for (Element element : retrofitBaseTypes) {
+
+            TypeSpec proxyType = TypeSpec.classBuilder(element.getSimpleName().toString() + "Proxy")
+                    .addSuperinterface(TypeName.get(element.asType()))
+                    .build();
+
+            JavaFile javaFile = JavaFile.builder("", proxyType).build();
+
+            try {
+                javaFile.writeTo(filer);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return true;
     }
 
     @Override
