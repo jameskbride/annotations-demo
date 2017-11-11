@@ -16,7 +16,7 @@ public class InterceptingCallback<T> implements okhttp3.Callback {
 
     @Override
     public void onFailure(okhttp3.Call call, IOException e) {
-
+        responseCallback.onFailure(call, e);
     }
 
     @Override

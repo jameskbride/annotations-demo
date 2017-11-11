@@ -9,6 +9,7 @@ import org.junit.Test;
 import java.io.IOException;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -36,12 +37,29 @@ public class InterceptingCallbackTest {
         assertEquals(Integer.valueOf(1), testObjectCallback.getActualResponse().getIntegerValue());
     }
 
+    @Test
+    public void onFailureInvokesTheCallbackOnFailure() {
+        InterceptingCallback<TestObject> interceptingCallback = new InterceptingCallback(testObjectCallback, TestObject.class);
+        IOException ioException = new IOException();
+        Call call = mock(Call.class);
+        interceptingCallback.onFailure(call, ioException);
+
+        assertTrue(testObjectCallback.onFailureCalled());
+        assertEquals(call, testObjectCallback.getFailureCall());
+        assertEquals(ioException, testObjectCallback.getFailureException());
+    }
+
     static class RecordingCallback implements Callback<TestObject> {
         private TestObject actualResponse;
+        private boolean onFailureCalled;
+        private IOException failureException;
+        private Call failureCall;
 
         @Override
         public void onFailure(Call call, IOException e) {
-
+            onFailureCalled = true;
+            this.failureCall = call;
+            this.failureException = e;
         }
 
         @Override
@@ -51,6 +69,18 @@ public class InterceptingCallbackTest {
 
         public TestObject getActualResponse() {
             return actualResponse;
+        }
+
+        public boolean onFailureCalled() {
+            return onFailureCalled;
+        }
+
+        public IOException getFailureException() {
+            return failureException;
+        }
+
+        public Call getFailureCall() {
+            return failureCall;
         }
     }
 
