@@ -74,7 +74,7 @@ public class CompiledRetrofitAnnotationProcessorTest extends CompilerTest {
     }
 
     @Test
-    public void itGeneratesAnErrorWhenTheRetrofitBaseIsNotAnInterface() throws URISyntaxException {
+    public void itGeneratesAnErrorWhenTheBaseIsNotAnInterface() throws URISyntaxException {
         File libraryFile = new File(getClassLoader().getResource("NotAnInterface.java").toURI());
 
         List<File> files = Arrays.asList(libraryFile);

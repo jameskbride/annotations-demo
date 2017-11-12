@@ -1,5 +1,6 @@
 package com.jameskbride.annotations.model;
 
+import com.jameskbride.annotations.Base;
 import com.squareup.javapoet.*;
 import okhttp3.OkHttpClient;
 
@@ -55,8 +56,12 @@ public class ProxyModel {
         return "";
     }
 
-    public void addMethod(Element element) {
-        MethodModel methodModel = new MethodModel(element);
+    public String getBaseUrl() {
+        return baseElement.getAnnotation(Base.class).value();
+    }
+
+    public void addMethod(Element element, String baseUrl) {
+        MethodModel methodModel = new MethodModel(element, baseUrl);
         methods.add(methodModel);
     }
 

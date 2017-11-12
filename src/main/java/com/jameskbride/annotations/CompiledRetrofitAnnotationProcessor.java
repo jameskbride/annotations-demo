@@ -22,7 +22,6 @@ public class CompiledRetrofitAnnotationProcessor extends AbstractProcessor {
 
     private Filer filer;
     private Messager messager;
-    private Elements elementUtils;
 
 
     @Override
@@ -31,7 +30,6 @@ public class CompiledRetrofitAnnotationProcessor extends AbstractProcessor {
 
         filer = processingEnv.getFiler();
         messager = processingEnv.getMessager();
-        elementUtils = processingEnv.getElementUtils();
     }
 
     @Override
@@ -88,7 +86,7 @@ public class CompiledRetrofitAnnotationProcessor extends AbstractProcessor {
             Element enclosingElement = getMethod.getEnclosingElement();
             ProxyModel proxyModel = proxyMap.get(enclosingElement.getSimpleName().toString());
             if (proxyModel != null) {
-                proxyModel.addMethod(getMethod);
+                proxyModel.addMethod(getMethod, proxyModel.getBaseUrl());
             }
         });
     }

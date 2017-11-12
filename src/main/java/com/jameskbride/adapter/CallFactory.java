@@ -1,6 +1,5 @@
 package com.jameskbride.adapter;
 
-import com.jameskbride.adapter.Call;
 import okhttp3.OkHttpClient;
 
 public class CallFactory<T> {
@@ -12,7 +11,7 @@ public class CallFactory<T> {
         this.client = client;
     }
 
-    public Call<T> make() {
+    public Call<T> make(String baseUrl) {
         return null;
     }
 }

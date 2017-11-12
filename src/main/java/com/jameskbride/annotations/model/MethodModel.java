@@ -12,9 +12,11 @@ import javax.lang.model.type.TypeMirror;
 
 public class MethodModel {
     private Element element;
+    private String baseUrl;
 
-    public MethodModel(Element element) {
+    public MethodModel(Element element, String baseUrl) {
         this.element = element;
+        this.baseUrl = baseUrl;
     }
 
     public MethodSpec build() {
@@ -42,7 +44,7 @@ public class MethodModel {
 
         return CodeBlock.builder()
                 .addStatement("$T callFactory = new $T(client)", CallFactory.class, callType)
-                .addStatement("return callFactory.make()")
+                .addStatement("return callFactory.make(\"$L\")", baseUrl)
                 .build();
     }
 }

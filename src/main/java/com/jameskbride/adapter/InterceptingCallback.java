@@ -23,7 +23,7 @@ public class InterceptingCallback<T> implements okhttp3.Callback {
     public void onResponse(okhttp3.Call call, okhttp3.Response response) throws IOException {
         Gson gson = new Gson();
         Object deserializedResponse = gson.fromJson(response.body().string(), responseType);
-        Response<T> tResponse = new Response<T>((T) deserializedResponse);
+        Response<T> tResponse = new Response<>((T) deserializedResponse);
         responseCallback.onResponse(call, tResponse);
     }
 }

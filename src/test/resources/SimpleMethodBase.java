@@ -2,7 +2,7 @@ import com.jameskbride.annotations.Base;
 import com.jameskbride.annotations.GET;
 import com.jameskbride.adapter.Call;
 
-@Base
+@Base("http://test.com")
 public interface SimpleMethodBase {
 
     @GET()
