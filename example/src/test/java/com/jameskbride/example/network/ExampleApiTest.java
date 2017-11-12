@@ -12,6 +12,6 @@ public class ExampleApiTest {
     public void itCanUseTheGeneratedClass() {
         ExampleApi exampleApi = new ExampleApiProxy();
         Call<SomeObject> call = exampleApi.getSomeObject();
-        assertEquals("http://localhost/", call.request().url().toString());
+        assertEquals("http://localhost:1080/", call.request().url().toString());
     }
 }

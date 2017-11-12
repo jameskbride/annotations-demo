@@ -27,4 +27,12 @@ public class SomeObject implements Serializable {
     public void setIntegerValue(Integer integerValue) {
         this.integerValue = integerValue;
     }
+
+    @Override
+    public String toString() {
+        return "SomeObject{" +
+                "stringValue='" + stringValue + '\'' +
+                ", integerValue=" + integerValue +
+                '}';
+    }
 }

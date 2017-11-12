@@ -1,0 +1,19 @@
+{
+  "httpRequest": {
+    "method": "GET",
+    "path": "/"
+  },
+  "httpResponse": {
+    "statusCode": 200,
+    "body": '{"stringValue":"some String","integerValue":7}',
+    "headers": [
+      {
+        "name": "Content-Type",
+        "values": ["application/json; charset=utf-8"]
+      }
+    ]
+  },
+  "times": {
+    "unlimited": true
+  }
+}

@@ -5,7 +5,7 @@ import com.jameskbride.annotations.Base;
 import com.jameskbride.annotations.GET;
 import com.jameskbride.example.model.SomeObject;
 
-@Base("http://localhost")
+@Base("http://localhost:1080")
 public interface ExampleApi {
 
     @GET("/")
