@@ -10,6 +10,9 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.ExecutableType;
 import javax.lang.model.type.TypeMirror;
+import javax.tools.Diagnostic;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MethodModel {
     private Element element;
@@ -21,7 +24,9 @@ public class MethodModel {
     }
 
     public MethodSpec build() {
-        TypeName returnTypeParam = buildReturnTypeParam();
+        ExecutableType method = (ExecutableType)element.asType();
+        DeclaredType returnType = (DeclaredType) method.getReturnType();
+        TypeName returnTypeParam = buildReturnTypeParam(returnType);
         TypeName callType = buildCallType(returnTypeParam);
         return MethodSpec.methodBuilder(element.getSimpleName().toString())
                 .addModifiers(Modifier.PUBLIC)
@@ -34,9 +39,8 @@ public class MethodModel {
         return ParameterizedTypeName.get(ClassName.get(Call.class), returnTypeParam);
     }
 
-    private TypeName buildReturnTypeParam() {
-        ExecutableType method = (ExecutableType)element.asType();
-        TypeMirror returnTypeParam = ((DeclaredType)method.getReturnType()).getTypeArguments().get(0);
+    private TypeName buildReturnTypeParam(DeclaredType returnType) {
+        TypeMirror returnTypeParam = returnType.getTypeArguments().get(0);
         return ClassName.get(returnTypeParam);
     }
 
@@ -51,5 +55,22 @@ public class MethodModel {
                         ClassName.bestGuess(returnTypeParam.toString()))
                 .addStatement("return callFactory.make(\"$L\", \"$L\")", baseUrl, path)
                 .build();
+    }
+
+    public List<Validation> validate() {
+        List<Validation> validations = new ArrayList<>();
+        ExecutableType method = (ExecutableType)element.asType();
+        DeclaredType returnType = (DeclaredType) method.getReturnType();
+
+        if (!returnType.toString().startsWith("com.jameskbride.adapter.Call")) {
+            validations.add(
+                    new Validation(
+                            Diagnostic.Kind.ERROR,
+                            "Return type must be of type " + Call.class.getName()
+                    )
+            );
+        }
+
+        return validations;
     }
 }

@@ -74,6 +74,14 @@ public class ProxyModel {
             validations.add(new Validation(Diagnostic.Kind.ERROR, "Base must be applied to an interface"));
         }
 
+        List<Validation> methodValidations = getMethodValidations();
+        validations.addAll(methodValidations);
         return validations;
+    }
+
+    private List<Validation> getMethodValidations() {
+        return methods.stream()
+                    .map(entry -> entry.validate())
+                    .reduce(new ArrayList<>(), (accum, validationList) -> {accum.addAll(validationList); return accum;});
     }
 }

@@ -13,6 +13,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 public abstract class CompilerTest {
     protected static String OUTPUT_PATH_NAME;
@@ -73,5 +74,12 @@ public abstract class CompilerTest {
         Class clazz = urlClassLoader.loadClass(fullyQualifiedClassName);
 
         return clazz;
+    }
+
+    protected Optional<Diagnostic<? extends JavaFileObject>> getDiagnosticForFirstError() {
+        return diagnosticCollector.getDiagnostics()
+                    .stream()
+                    .filter(diagnostic -> diagnostic.getKind().equals(Diagnostic.Kind.ERROR))
+                    .findAny();
     }
 }

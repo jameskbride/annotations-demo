@@ -37,13 +37,12 @@ public class CompiledRetrofitAnnotationProcessor extends AbstractProcessor {
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         Map<String, ProxyModel> proxyMap = handleBase(roundEnv);
+        handleGET(roundEnv, proxyMap);
         List<Validation> validations = getValidations(proxyMap);
         printCompileMessages(validations);
         if (errorsPresent(validations)) {
             return true;
         }
-
-        handleGET(roundEnv, proxyMap);
         writeJavaClasses(proxyMap);
 
         return true;

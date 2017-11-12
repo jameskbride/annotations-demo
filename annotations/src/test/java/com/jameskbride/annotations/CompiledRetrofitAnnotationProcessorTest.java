@@ -2,6 +2,7 @@ package com.jameskbride.annotations;
 
 import com.google.common.collect.Sets;
 import com.jameskbride.adapter.Call;
+import junit.framework.TestCase;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -82,11 +83,22 @@ public class CompiledRetrofitAnnotationProcessorTest extends CompilerTest {
 
         assertFalse(result);
 
-        Optional<Diagnostic<? extends JavaFileObject>> error = diagnosticCollector.getDiagnostics()
-                .stream()
-                .filter(diagnostic -> diagnostic.getKind().equals(Diagnostic.Kind.ERROR))
-                .findAny();
+        Optional<Diagnostic<? extends JavaFileObject>> error = getDiagnosticForFirstError();
         assertEquals("Base must be applied to an interface", error.get().getMessage(Locale.US));
+    }
+
+    @Test
+    public void itGeneratesAnErrorWhenTheReturnTypeOfTheGETMethodIsNotACall() throws URISyntaxException {
+        File libraryFile = new File(getClassLoader().getResource("WrongReturnTypeBase.java").toURI());
+        File testClassFile = new File(getClassLoader().getResource("TestClass.java").toURI());
+
+        List<File> files = Arrays.asList(libraryFile,testClassFile);
+        boolean result = compile(files, processor);
+
+        assertFalse(result);
+
+        Optional<Diagnostic<? extends JavaFileObject>> error = getDiagnosticForFirstError();
+        assertEquals("Return type must be of type com.jameskbride.adapter.Call", error.get().getMessage(Locale.US));
     }
 
     @Test
