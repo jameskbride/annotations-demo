@@ -62,7 +62,7 @@ public class ProxyModel {
 
     public List<Validation> validate() {
         if (!baseElement.getKind().isInterface()) {
-            validations.add(new Validation(Diagnostic.Kind.ERROR, "RetrofitBase must be applied to an interface"));
+            validations.add(new Validation(Diagnostic.Kind.ERROR, "Base must be applied to an interface"));
         }
 
         return validations;

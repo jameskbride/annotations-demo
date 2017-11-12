@@ -90,7 +90,7 @@ public class CompiledRetrofitAnnotationProcessor extends AbstractProcessor {
     }
 
     private Map<String, ProxyModel> handleRetrofitBase(RoundEnvironment roundEnv) {
-        Set<? extends Element> retrofitBaseTypes = roundEnv.getElementsAnnotatedWith(RetrofitBase.class);
+        Set<? extends Element> retrofitBaseTypes = roundEnv.getElementsAnnotatedWith(Base.class);
         Map<String, ProxyModel> proxyMap = new HashMap<>();
         retrofitBaseTypes.stream().forEach(element -> {
             ProxyModel proxyModel = new ProxyModel(element);
@@ -107,7 +107,7 @@ public class CompiledRetrofitAnnotationProcessor extends AbstractProcessor {
     @Override
     public Set<String> getSupportedAnnotationTypes() {
         return Sets.newHashSet(
-                RetrofitBase.class.getCanonicalName(),
+                Base.class.getCanonicalName(),
                 GET.class.getCanonicalName()
         );
     }

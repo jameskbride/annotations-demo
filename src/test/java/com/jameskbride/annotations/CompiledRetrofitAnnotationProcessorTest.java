@@ -40,7 +40,7 @@ public class CompiledRetrofitAnnotationProcessorTest extends CompilerTest {
     public void itHasAListOfSupportedAnnotations() {
         assertTrue(processor.getSupportedAnnotationTypes().containsAll(
                 Sets.newHashSet(
-                        RetrofitBase.class.getCanonicalName(),
+                        Base.class.getCanonicalName(),
                         GET.class.getCanonicalName()
                 ))
         );
@@ -86,7 +86,7 @@ public class CompiledRetrofitAnnotationProcessorTest extends CompilerTest {
                 .stream()
                 .filter(diagnostic -> diagnostic.getKind().equals(Diagnostic.Kind.ERROR))
                 .findAny();
-        assertEquals("RetrofitBase must be applied to an interface", error.get().getMessage(Locale.US));
+        assertEquals("Base must be applied to an interface", error.get().getMessage(Locale.US));
     }
 
     @Test

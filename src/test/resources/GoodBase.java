@@ -1,6 +1,6 @@
-import com.jameskbride.annotations.RetrofitBase;
+import com.jameskbride.annotations.Base;
 
-@RetrofitBase
+@Base
 public interface GoodBase {
 
 }

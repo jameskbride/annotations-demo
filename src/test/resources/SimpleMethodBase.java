@@ -1,8 +1,8 @@
-import com.jameskbride.annotations.RetrofitBase;
+import com.jameskbride.annotations.Base;
 import com.jameskbride.annotations.GET;
 import okhttp3.Call;
 
-@RetrofitBase
+@Base
 public interface SimpleMethodBase {
 
     @GET()
