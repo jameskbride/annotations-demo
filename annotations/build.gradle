@@ -1,5 +1,5 @@
 apply plugin: 'java-library'
-apply plugin: "maven"
+apply plugin: "maven-publish"
 group 'com.jameskbride'
 version '0.0.1'
 
