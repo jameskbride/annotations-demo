@@ -6,6 +6,8 @@ import okhttp3.OkHttpClient;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
+import javax.lang.model.element.PackageElement;
+import javax.lang.model.util.Elements;
 import javax.tools.Diagnostic;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -17,8 +19,10 @@ public class ProxyModel {
     private Element baseElement;
     private Set<MethodModel> methods;
     private List<Validation> validations;
+    private Elements elementUtils;
 
-    public ProxyModel(Element element) {
+    public ProxyModel(Element element, Elements elementUtils) {
+        this.elementUtils = elementUtils;
         validations = new ArrayList<>();
         methods = new HashSet<>();
         baseElement = element;
@@ -52,8 +56,8 @@ public class ProxyModel {
             .initializer("new $T()", ClassName.get(OkHttpClient.class)).build();
     }
 
-    public String getPackage() {
-        return "";
+    public PackageElement getPackage() {
+        return elementUtils.getPackageOf(baseElement);
     }
 
     public String getBaseUrl() {

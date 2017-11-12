@@ -1,0 +1,37 @@
+buildscript {
+    repositories {
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath "net.ltgt.gradle:gradle-apt-plugin:0.13"
+    }
+}
+
+apply plugin: 'java'
+apply plugin: "net.ltgt.apt"
+
+dependencies {
+    compile 'com.jameskbride:annotations:0.0.1'
+    apt 'com.jameskbride:annotations:0.0.1'
+    compile'com.squareup.okhttp3:okhttp:3.9.0'
+    implementation 'com.google.code.gson:gson:2.8.2'
+
+    testImplementation 'junit:junit:4.12'
+    testImplementation 'org.mockito:mockito-core:2.10.0'
+}
+
+sourceSets {
+//    mainApt {
+//        java {
+//            srcDir 'build/generated/source/apt/main'
+////            compileClasspath += sourceSets.main.compileClasspath
+//        }
+//    }
+    main {
+        java {
+            srcDirs 'src/main/java', 'build/generated/source/apt/main'
+        }
+    }
+}

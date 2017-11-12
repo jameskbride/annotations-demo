@@ -10,18 +10,19 @@ import com.squareup.javapoet.TypeSpec;
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.type.ExecutableType;
 import javax.lang.model.util.Elements;
 import javax.tools.Diagnostic;
 import java.io.IOException;
 import java.util.*;
 
-@AutoService(AbstractProcessor.class)
+@AutoService(Processor.class)
 public class CompiledRetrofitAnnotationProcessor extends AbstractProcessor {
 
     private Filer filer;
     private Messager messager;
+    private Elements elementUtils;
 
 
     @Override
@@ -30,6 +31,7 @@ public class CompiledRetrofitAnnotationProcessor extends AbstractProcessor {
 
         filer = processingEnv.getFiler();
         messager = processingEnv.getMessager();
+        elementUtils = processingEnv.getElementUtils();
     }
 
     @Override
@@ -70,7 +72,7 @@ public class CompiledRetrofitAnnotationProcessor extends AbstractProcessor {
         proxyMap.entrySet().stream().forEach(proxyModelEntry -> {
             ProxyModel proxyModel = proxyModelEntry.getValue();
             TypeSpec proxyType = proxyModel.buildTypeSpec();
-            JavaFile javaFile = JavaFile.builder(proxyModel.getPackage(), proxyType).build();
+            JavaFile javaFile = JavaFile.builder(proxyModel.getPackage().getQualifiedName().toString(), proxyType).build();
 
             try {
                 javaFile.writeTo(filer);
@@ -95,7 +97,7 @@ public class CompiledRetrofitAnnotationProcessor extends AbstractProcessor {
         Set<? extends Element> retrofitBaseTypes = roundEnv.getElementsAnnotatedWith(Base.class);
         Map<String, ProxyModel> proxyMap = new HashMap<>();
         retrofitBaseTypes.stream().forEach(element -> {
-            ProxyModel proxyModel = new ProxyModel(element);
+            ProxyModel proxyModel = new ProxyModel(element, elementUtils);
             proxyMap.put(element.getSimpleName().toString(), proxyModel);
         });
         return proxyMap;
