@@ -1,5 +1,6 @@
 package com.jameskbride.adapter;
 
+import okhttp3.Headers;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 
@@ -17,6 +18,7 @@ public class CallFactory<T> {
         Request.Builder builder = new Request.Builder();
         Request request = builder
                 .url(baseUrl + path)
+                .headers(Headers.of("ContentType", "application/json"))
                 .build();
         okhttp3.Call okHttpCall = client.newCall(request);
 
