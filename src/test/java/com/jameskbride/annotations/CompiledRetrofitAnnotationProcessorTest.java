@@ -1,7 +1,7 @@
 package com.jameskbride.annotations;
 
 import com.google.common.collect.Sets;
-import okhttp3.Call;
+import com.jameskbride.adapter.Call;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -91,9 +91,10 @@ public class CompiledRetrofitAnnotationProcessorTest extends CompilerTest {
 
     @Test
     public void itGeneratesAMethodForAGETAnnotation() throws MalformedURLException, ClassNotFoundException, URISyntaxException, NoSuchMethodException {
-        File libraryFile = new File(getClassLoader().getResource("SimpleMethodBase.java").toURI());
+        File simpleMethodBase = new File(getClassLoader().getResource("SimpleMethodBase.java").toURI());
+        File testClassFile = new File(getClassLoader().getResource("TestClass.java").toURI());
 
-        List<File> files = Arrays.asList(libraryFile);
+        List<File> files = Arrays.asList(simpleMethodBase, testClassFile);
         boolean result = compile(files, processor);
 
         assertTrue(result);

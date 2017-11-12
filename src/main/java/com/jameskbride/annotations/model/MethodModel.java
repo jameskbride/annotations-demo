@@ -1,13 +1,14 @@
 package com.jameskbride.annotations.model;
 
-import com.squareup.javapoet.CodeBlock;
-import com.squareup.javapoet.MethodSpec;
-import com.squareup.javapoet.TypeName;
-import okhttp3.Call;
-import okhttp3.Request;
+import com.jameskbride.adapter.Call;
+import com.jameskbride.adapter.CallFactory;
+import com.squareup.javapoet.*;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
+import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.ExecutableType;
+import javax.lang.model.type.TypeMirror;
 
 public class MethodModel {
     private Element element;
@@ -17,17 +18,31 @@ public class MethodModel {
     }
 
     public MethodSpec build() {
+        TypeName returnTypeParam = buildReturnTypeParam();
+        TypeName callType = buildCallType(returnTypeParam);
         return MethodSpec.methodBuilder(element.getSimpleName().toString())
                 .addModifiers(Modifier.PUBLIC)
-                .returns(TypeName.get(Call.class))
-                .addCode(generateRequestMethod())
+                .returns(callType)
+                .addCode(generateRequestMethod(returnTypeParam))
                 .build();
     }
 
-    private CodeBlock generateRequestMethod() {
+    private ParameterizedTypeName buildCallType(TypeName returnTypeParam) {
+        return ParameterizedTypeName.get(ClassName.get(Call.class), returnTypeParam);
+    }
+
+    private TypeName buildReturnTypeParam() {
+        ExecutableType method = (ExecutableType)element.asType();
+        TypeMirror returnTypeParam = ((DeclaredType)method.getReturnType()).getTypeArguments().get(0);
+        return ClassName.get(returnTypeParam);
+    }
+
+    private CodeBlock generateRequestMethod(TypeName returnTypeParam) {
+        TypeName callType = ParameterizedTypeName.get(ClassName.get(CallFactory.class), returnTypeParam);
+
         return CodeBlock.builder()
-                .addStatement("$T request = new Request.Builder()", Request.Builder.class)
-                .addStatement("return client.newCall(request.build())")
+                .addStatement("$T callFactory = new $T(client)", CallFactory.class, callType)
+                .addStatement("return callFactory.make()")
                 .build();
     }
 }

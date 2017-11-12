@@ -11,6 +11,8 @@ import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.ExecutableType;
+import javax.lang.model.util.Elements;
 import javax.tools.Diagnostic;
 import java.io.IOException;
 import java.util.*;
@@ -20,6 +22,7 @@ public class CompiledRetrofitAnnotationProcessor extends AbstractProcessor {
 
     private Filer filer;
     private Messager messager;
+    private Elements elementUtils;
 
 
     @Override
@@ -28,11 +31,12 @@ public class CompiledRetrofitAnnotationProcessor extends AbstractProcessor {
 
         filer = processingEnv.getFiler();
         messager = processingEnv.getMessager();
+        elementUtils = processingEnv.getElementUtils();
     }
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-        Map<String, ProxyModel> proxyMap = handleRetrofitBase(roundEnv);
+        Map<String, ProxyModel> proxyMap = handleBase(roundEnv);
         List<Validation> validations = getValidations(proxyMap);
         printCompileMessages(validations);
         if (errorsPresent(validations)) {
@@ -89,7 +93,7 @@ public class CompiledRetrofitAnnotationProcessor extends AbstractProcessor {
         });
     }
 
-    private Map<String, ProxyModel> handleRetrofitBase(RoundEnvironment roundEnv) {
+    private Map<String, ProxyModel> handleBase(RoundEnvironment roundEnv) {
         Set<? extends Element> retrofitBaseTypes = roundEnv.getElementsAnnotatedWith(Base.class);
         Map<String, ProxyModel> proxyMap = new HashMap<>();
         retrofitBaseTypes.stream().forEach(element -> {

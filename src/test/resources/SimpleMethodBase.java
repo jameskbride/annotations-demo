@@ -1,10 +1,10 @@
 import com.jameskbride.annotations.Base;
 import com.jameskbride.annotations.GET;
-import okhttp3.Call;
+import com.jameskbride.adapter.Call;
 
 @Base
 public interface SimpleMethodBase {
 
     @GET()
-    Call returnSomething();
+    Call<TestClass> returnSomething();
 }
