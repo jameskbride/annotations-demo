@@ -2,6 +2,7 @@ package com.jameskbride.annotations.model;
 
 import com.jameskbride.adapter.Call;
 import com.jameskbride.adapter.CallFactory;
+import com.jameskbride.annotations.GET;
 import com.squareup.javapoet.*;
 
 import javax.lang.model.element.Element;
@@ -41,10 +42,14 @@ public class MethodModel {
 
     private CodeBlock generateRequestMethod(TypeName returnTypeParam) {
         TypeName callType = ParameterizedTypeName.get(ClassName.get(CallFactory.class), returnTypeParam);
+        String path = element.getAnnotation(GET.class).value();
 
         return CodeBlock.builder()
-                .addStatement("$T callFactory = new $T(client)", CallFactory.class, callType)
-                .addStatement("return callFactory.make(\"$L\")", baseUrl)
+                .addStatement("$T callFactory = new $T(client, $T.class)",
+                        CallFactory.class,
+                        callType,
+                        ClassName.bestGuess(returnTypeParam.toString()))
+                .addStatement("return callFactory.make(\"$L\", \"$L\")", baseUrl, path)
                 .build();
     }
 }
