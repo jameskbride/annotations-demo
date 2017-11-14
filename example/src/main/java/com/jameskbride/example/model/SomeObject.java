@@ -1,10 +1,17 @@
 package com.jameskbride.example.model;
 
+import com.jameskbride.example.runtime.ClassMarker;
+import com.jameskbride.example.runtime.MethodMarker;
+import com.jameskbride.example.runtime.PropertyMarker;
+
 import java.io.Serializable;
 
+@ClassMarker(className = "This is SomeObject")
 public class SomeObject implements Serializable {
 
+    @PropertyMarker(propertyName = "The stringValue")
     private String stringValue;
+    @PropertyMarker(propertyName = "The integerValue")
     private Integer integerValue;
 
     public SomeObject(String stringValue, Integer integerValue) {
@@ -12,6 +19,7 @@ public class SomeObject implements Serializable {
         this.integerValue = integerValue;
     }
 
+    @MethodMarker(methodName = "Method 1")
     public String getStringValue() {
         return stringValue;
     }
@@ -20,6 +28,7 @@ public class SomeObject implements Serializable {
         this.stringValue = stringValue;
     }
 
+    @MethodMarker(methodName = "Method 2")
     public Integer getIntegerValue() {
         return integerValue;
     }

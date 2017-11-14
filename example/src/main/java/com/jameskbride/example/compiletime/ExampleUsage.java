@@ -1,11 +1,11 @@
-package com.jameskbride.example;
+package com.jameskbride.example.compiletime;
 
 import com.jameskbride.adapter.Call;
 import com.jameskbride.adapter.Callback;
 import com.jameskbride.adapter.Response;
 import com.jameskbride.example.model.SomeObject;
-import com.jameskbride.example.network.ExampleApi;
-import com.jameskbride.example.network.ExampleApiProxy;
+import com.jameskbride.example.compiletime.network.ExampleApi;
+import com.jameskbride.example.compiletime.network.ExampleApiProxy;
 
 import java.io.IOException;
 
