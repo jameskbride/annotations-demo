@@ -49,7 +49,8 @@ public class CompiledRetrofitAnnotationProcessor extends AbstractProcessor {
     }
 
     private void printCompileMessages(List<Validation> validations) {
-        validations.stream().forEach(validation -> messager.printMessage(validation.getKind(), validation.getMessage()));
+        validations.stream().forEach(validation ->
+                messager.printMessage(validation.getKind(), validation.getMessage()));
     }
 
     private List<Validation> getValidations(Map<String, ProxyModel> proxyMap) {
@@ -71,7 +72,10 @@ public class CompiledRetrofitAnnotationProcessor extends AbstractProcessor {
         proxyMap.entrySet().stream().forEach(proxyModelEntry -> {
             ProxyModel proxyModel = proxyModelEntry.getValue();
             TypeSpec proxyType = proxyModel.buildTypeSpec();
-            JavaFile javaFile = JavaFile.builder(proxyModel.getPackage().getQualifiedName().toString(), proxyType).build();
+            JavaFile javaFile = JavaFile.builder(
+                    proxyModel.getPackage().getQualifiedName().toString(),
+                    proxyType)
+                    .build();
 
             try {
                 javaFile.writeTo(filer);
