@@ -53,7 +53,7 @@ public class MethodModel {
                         CallFactory.class,
                         callType,
                         ClassName.bestGuess(returnTypeParam.toString()))
-                .addStatement("return callFactory.make(\"$L\", \"$L\")", baseUrl, path)
+                .addStatement("return callFactory.make($S, $S)", baseUrl, path)
                 .build();
     }
 
